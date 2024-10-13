@@ -8,12 +8,12 @@ async function start() {
 
   const config = new DocumentBuilder()
     .setTitle('Jira')
-    .setDescription('REST API Documentation')
+    .setDescription('API Documentation')
     .setVersion('0.0.1')
     .build()
   const document = SwaggerModule.createDocument(app, config)
   SwaggerModule.setup('/api/docs', app, document)
 
-  await app.listen(PORT, () => console.log(`Server started on port = ${PORT}`));
+  await app.listen(PORT, () => console.log(`Server started on PORT: ${PORT}`));
 }
 start();
