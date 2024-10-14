@@ -37,7 +37,6 @@ export class ProjectController {
   }
 
   @ApiOperation({summary: 'Delete the project by id'})
-  @ApiResponse({type: Project})
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     return this.projectService.remove(+id);
