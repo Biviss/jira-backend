@@ -27,6 +27,10 @@ export class Task {
   @Column()
   executor: string;
 
+  @ApiProperty({example: 'Project1'})
+  @Column()
+  projectTitle: string;
+
   @ApiProperty({example: '2024-10-15'})
   @Column()
   deadline: Date;

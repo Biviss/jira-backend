@@ -27,6 +27,11 @@ export class CreateTaskDto {
   @IsNotEmpty()
   executor: string;
 
+  @ApiProperty({example: 'Project1'})
+  @IsString()
+  @IsNotEmpty()
+  projectTitle: string;
+
   @ApiProperty({example: '2024-10-15'})
   @IsDate()
   @IsNotEmpty()

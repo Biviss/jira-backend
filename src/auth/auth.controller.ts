@@ -5,11 +5,6 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { ApiOperation, ApiProperty, ApiResponse } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 
-class LoginResponseDto {
-  @ApiProperty({example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWxlQG1haWwuY29tIiwic3ViIjoyLCJpYXQiOjE3Mjg4MjI3ODQsImV4cCI6MTcyODkwOTE4NH0.WfVdFEQT-p4tPHMZMaHfvmWk1vPKfBPn7_UXOUM7tTg'})
-  accessToken: string;
-}
-
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -22,7 +17,11 @@ export class AuthController {
   }
 
   @ApiOperation({summary: 'Log in users'})
-  @ApiResponse({type: LoginResponseDto})
+  @ApiResponse({schema: {
+    example: {
+      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImVtYWxlQG1haWwuY29tIiwic3ViIjoyLCJpYXQiOjE3MjkwMTc0ODksImV4cCI6MTcyOTEwMzg4OX0.EMPa8CUqfx2juUJLg5F7XM3jw5wfbYQqFq__5u0MEY8"
+    },
+  }})
   @Post('login')
   async login(@Body() dto: LoginUserDto) {
     return this.authService.login(dto);

@@ -4,26 +4,43 @@ import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 import { Task } from '../task/entities/task.entity';
 import { ApiOperation, ApiProperty, ApiResponse } from '@nestjs/swagger';
 
-export class TaskResponse {
-  @ApiProperty({ type: [Task]})
-  Backlog: Task[];
-
-  @ApiProperty({ type: [Task]})
-  'To Do': Task[];
-
-  @ApiProperty({ type: [Task]})
-  'In Progress': Task[];
-
-  @ApiProperty({ type: [Task]})
-  Done: Task[];
-}
-
 @Controller('board')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
   @ApiOperation({summary: 'Get all tasks by status'})
-  @ApiResponse({type: TaskResponse})
+  @ApiResponse({schema: {
+    example: {
+      "Backlog": [],
+      "To Do": [],
+      "In Progress": [
+        {
+          "id": 1,
+          "title": "Task1",
+          "description": "This is the Task1",
+          "status": "In Progress",
+          "type": "Task",
+          "executor": "user1@mail.com",
+          "projectTitle": "Project1",
+          "deadline": "2024-10-14T21:00:00.000Z",
+          "priority": "Medium"
+        }
+      ],
+      "Done": [
+        {
+          "id": 2,
+          "title": "Task2",
+          "description": "This is the Task2",
+          "status": "Done",
+          "type": "Task",
+          "executor": "user1@mail.com",
+          "projectTitle": "Project1",
+          "deadline": "2024-10-14T21:00:00.000Z",
+          "priority": "Medium"
+        }
+      ]
+    },
+  }})
   @Get()
   getAllTasks(): Promise<Record<string, Task[]>> {
     return this.boardService.getAllTasks();

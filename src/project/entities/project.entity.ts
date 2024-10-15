@@ -18,4 +18,8 @@ export class Project {
   @ApiProperty({example: ['user1@mail.com','user2@mail.com']})
   @Column("text", { array: true })
   participants: string[];
+
+  @ApiProperty({example: ['Task1','Task2']})
+  @Column("text", { array: true })
+  tasksTitles: string[];
 }

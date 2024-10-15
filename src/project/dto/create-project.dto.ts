@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsEnum } from 'class-validator';
 
 export class CreateProjectDto {
   @ApiProperty({example: 'Project1'})
@@ -15,4 +15,8 @@ export class CreateProjectDto {
   @ApiProperty({example: ['user1@mail.com','user2@mail.com']})
   @IsNotEmpty()
   participants: string[];
+
+  @ApiProperty({example: ['Task1','Task2']})
+  @IsNotEmpty()
+  tasksTitles: string[];
 }
