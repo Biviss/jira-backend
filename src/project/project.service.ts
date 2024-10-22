@@ -1,14 +1,19 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { Project } from './entities/project.entity';
+import { User } from '../auth/entities/user.entity';
 
 @Injectable()
 export class ProjectService {
   constructor(
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectDataSource()
+    private dataSource: DataSource
   ) {}
 
   async create(dto: CreateProjectDto): Promise<Project> {
@@ -32,6 +37,31 @@ export class ProjectService {
 
   async remove(id: number): Promise<void> {
     await this.projectRepository.delete(id);
+  }
+
+  async addExecutorToProject(projectId: number, userId: number): Promise<void> {
+    const project = await this.findOne(projectId);
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
+    }
+  
+    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['projects'] });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+  
+    if (!project.executors.find((executor) => executor.id === userId)) {
+      project.executors.push(user);
+    }
+  
+    if (!user.projects.find((proj) => proj.id === projectId)) {
+      user.projects.push(project);
+    }
+  
+    await this.dataSource.transaction(async (manager) => {
+      await manager.save(project);
+      await manager.save(user);
+    });
   }
 }
 
