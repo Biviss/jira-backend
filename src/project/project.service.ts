@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { Project } from './entities/project.entity';
 import { User } from '../auth/entities/user.entity';
@@ -11,9 +11,7 @@ export class ProjectService {
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
     @InjectRepository(User)
-    private userRepository: Repository<User>,
-    @InjectDataSource()
-    private dataSource: DataSource
+    private userRepository: Repository<User>
   ) {}
 
   async create(dto: CreateProjectDto): Promise<Project> {
@@ -58,10 +56,8 @@ export class ProjectService {
       user.projects.push(project);
     }
   
-    await this.dataSource.transaction(async (manager) => {
-      await manager.save(project);
-      await manager.save(user);
-    });
+    await this.projectRepository.save(project);
+    await this.userRepository.save(user);
   }
 }
 
