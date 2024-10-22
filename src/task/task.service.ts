@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
 import { Project } from '../project/entities/project.entity'
+import { User } from '../auth/entities/user.entity';
+
 
 @Injectable()
 export class TaskService {
@@ -12,6 +14,8 @@ export class TaskService {
     private readonly taskRepository: Repository<Task>,
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>
   ) {}
 
   async create(createTaskDto: CreateTaskDto): Promise<Task> {
@@ -44,5 +48,28 @@ export class TaskService {
 
   async remove(id: number): Promise<void> {
     await this.taskRepository.delete(id);
+  }
+
+  async addExecutorToTask(taskId: number, userId: number): Promise<void> {
+    const task = await this.taskRepository.findOne({ where: { id: taskId }, relations: ['executors'] });
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${taskId} not found`);
+    }
+
+    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['tasks'] });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    if (!task.executors.find(executor => executor.id === userId)) {
+      task.executors.push(user);
+    }
+
+    if (!user.tasks.find(task => task.id === taskId)) {
+      user.tasks.push(task);
+    }
+
+    await this.taskRepository.save(task);
+    await this.userRepository.save(user);
   }
 }

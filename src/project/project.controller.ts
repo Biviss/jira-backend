@@ -43,6 +43,7 @@ export class ProjectController {
     return this.projectService.remove(+id);
   }
 
+  @ApiOperation({summary: 'Add the executor to the project and vice versa'})
   @Post(':projectId/executors/:userId')
   async addExecutorToProject(
     @Param('projectId') projectId: number,

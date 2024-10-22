@@ -42,4 +42,13 @@ export class TaskController {
   async remove(@Param('id') id: string): Promise<void> {
     return this.taskService.remove(+id);
   }
+
+  @ApiOperation({summary: 'Add the executor to the task and vice versa'})
+  @Post(':taskId/executors/:userId')
+  async addExecutorToTask(
+    @Param('taskId') taskId: number,
+    @Param('userId') userId: number,
+  ): Promise<void> {
+    await this.taskService.addExecutorToTask(taskId, userId);
+  }
 }
