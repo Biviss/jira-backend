@@ -15,63 +15,63 @@ export class ReportService {
   ) {}
 
   async getProjectReport(filterDto: ReportFilterDto) {
-    const { projectTitle } = filterDto;
-  
-    const project = await this.projectRepository.findOne({
-      where: { title: projectTitle },
+    const { project } = filterDto;
+
+    const foundProject = await this.projectRepository.findOne({
+      where: { id: project.id },
     });
-  
-    if (!project) {
-      throw new Error(`Project with title ${projectTitle} not found`);
+
+    if (!foundProject) {
+      throw new Error(`Project with id ${project.id} not found`);
     }
-  
+
     const tasks = await this.taskRepository.find({
-      where: { projectTitle: project.title },
+      where: { project: { id: foundProject.id } },
     });
-  
+
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter((task) => task.status === 'Done').length;
     const progress = totalTasks > 0 ? `${(completedTasks / totalTasks) * 100}%` : '0%';
-  
+
     return {
-      projectTitle: project.title,
+      projectTitle: foundProject.title,
       totalTasks,
       completedTasks,
       progress,
     };
   }
-  
 
   async getUserReport(userEmail: string) {
-    const tasks = await this.taskRepository.find({
-      where: { executor: userEmail },
-    });
+    return {data: 'TODO'}
+    // const tasks = await this.taskRepository.find({
+    //   where: { executors: userEmail },
+    // });
 
-    const totalTasks = tasks.length;
-    const completedTasks = tasks.filter((task) => task.status === 'Done').length;
-    const progress = totalTasks > 0 ? `${(completedTasks / totalTasks) * 100}%` : '0%';
+    // const totalTasks = tasks.length;
+    // const completedTasks = tasks.filter((task) => task.status === 'Done').length;
+    // const progress = totalTasks > 0 ? `${(completedTasks / totalTasks) * 100}%` : '0%';
 
-    return {
-      userEmail,
-      totalTasks,
-      completedTasks,
-      progress,
-    };
+    // return {
+    //   userEmail,
+    //   totalTasks,
+    //   completedTasks,
+    //   progress,
+    // };
   }
 
   async getTaskProgress(filterDto: ReportFilterDto) {
-    const { projectTitle } = filterDto;
+    const { project } = filterDto;
 
-    const project = await this.projectRepository.findOne({
-      where: { title: projectTitle },
+    const foundProject = await this.projectRepository.findOne({
+      where: { id: project.id },
     });
 
-    if (!project) {
-      throw new Error(`Project with title ${projectTitle} not found`);
+    if (!foundProject) {
+      throw new Error(`Project with id ${project.id} not found`);
     }
 
     const tasks = await this.taskRepository.find({
-      where: { projectTitle: project.title },
+      where: { project: { id: foundProject.id } },
     });
 
     const backlog = tasks.filter((task) => task.status === 'Backlog').length;
@@ -80,7 +80,7 @@ export class ReportService {
     const done = tasks.filter((task) => task.status === 'Done').length;
 
     return {
-      projectTitle: project.title,
+      projectTitle: foundProject.title,
       backlog,
       todo,
       inProgress,

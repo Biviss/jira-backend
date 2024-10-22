@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
+import { Project } from '../../project/entities/project.entity'
 
 export class ReportFilterDto {
-  @ApiProperty({ example: 'Project1' })
-  @IsString()
+  @ApiProperty({ type: Project })
   @IsNotEmpty()
-  projectTitle: string;
+  project: Project;
 }
