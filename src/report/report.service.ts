@@ -1,15 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Task } from '../task/entities/task.entity';
 import { Project } from '../project/entities/project.entity';
 import { User } from '../auth/entities/user.entity'
 
 @Injectable()
 export class ReportService {
   constructor(
-    @InjectRepository(Task)
-    private readonly taskRepository: Repository<Task>,
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
     @InjectRepository(User)
@@ -18,6 +15,11 @@ export class ReportService {
 
   async getProjectReport(projectId: number) {
     const project = await this.projectRepository.findOne({where: { id: projectId }, relations: ['executors', 'tasks']});
+
+    if (!project) {
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
+    }
+
     const projectTitle = project.title;
     const totalTasks = project.tasks.length;
     const completedTasks = project.tasks.filter((task) => task.status === 'Done').length;
@@ -40,6 +42,11 @@ export class ReportService {
 
   async getUserReport(userId: number) {
     const user = await this.userRepository.findOne({where: { id: userId }, relations: ['projects', 'tasks']});
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
     const userEmale = user.email;
     const totalTasks = user.tasks.length;
     const totalProjects = user.projects.length;

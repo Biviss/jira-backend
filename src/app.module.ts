@@ -6,6 +6,7 @@ import { ProjectModule } from './project/project.module';
 import { TaskModule } from './task/task.module';
 import { BoardModule } from './board/board.module';
 import { ReportModule } from './report/report.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { ReportModule } from './report/report.module';
   ProjectModule,
   TaskModule,
   BoardModule,
-  ReportModule]
+  ReportModule,
+  NotificationModule]
 })
 export class AppModule {}

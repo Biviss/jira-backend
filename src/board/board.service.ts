@@ -21,10 +21,7 @@ export class BoardService {
     };
   }
 
-  async updateTaskStatus(
-    id: number,
-    updateTaskStatusDto: UpdateTaskStatusDto,
-  ): Promise<Task> {
+  async updateTaskStatus(id: number, updateTaskStatusDto: UpdateTaskStatusDto): Promise<Task> {
     const task = await this.taskRepository.findOne({ where: { id } });
 
     if (!task) {
