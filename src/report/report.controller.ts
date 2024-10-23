@@ -1,6 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ReportService } from './report.service';
-import { ReportFilterDto } from './dto/report-filter.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('report')
@@ -14,14 +13,17 @@ export class ReportController {
       example: {
         projectTitle: 'Project1',
         totalTasks: 2,
-        completedTasks: 1,
+        backlog: 0,
+        todo: 0,
+        inProgress: 1,
+        done: 1,
         progress: '50%',
       },
     },
   })
   @Get('project')
-  async getProjectReport(@Query() filterDto: ReportFilterDto) {
-    return this.reportService.getProjectReport(filterDto);
+  async getProjectReport(@Query('pojectId') projectId: number) {
+    return this.reportService.getProjectReport(projectId);
   }
 
   @ApiOperation({ summary: 'Get user report' })
@@ -36,24 +38,7 @@ export class ReportController {
     },
   })
   @Get('user')
-  async getUserReport(@Query('userEmail') userEmail: string) {
-    return this.reportService.getUserReport(userEmail);
-  }
-
-  @ApiOperation({ summary: 'Get task progress for a project' })
-  @ApiResponse({ 
-    schema: {
-      example: {
-        projectTitle: 'Project1',
-        backlog: 0,
-        todo: 0,
-        inProgress: 1,
-        done: 1,
-      },
-    },
-  })
-  @Get('task-progress')
-  async getTaskProgress(@Query() filterDto: ReportFilterDto) {
-    return this.reportService.getTaskProgress(filterDto);
+  async getUserReport(@Query('userId') id: number) {
+    return this.reportService.getUserReport(id);
   }
 }

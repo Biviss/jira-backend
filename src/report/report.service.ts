@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ReportFilterDto } from './dto/report-filter.dto';
 import { Task } from '../task/entities/task.entity';
 import { Project } from '../project/entities/project.entity';
+import { User } from '../auth/entities/user.entity'
 
 @Injectable()
 export class ReportService {
@@ -12,79 +12,46 @@ export class ReportService {
     private readonly taskRepository: Repository<Task>,
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
   ) {}
 
-  async getProjectReport(filterDto: ReportFilterDto) {
-    const { project } = filterDto;
-
-    const foundProject = await this.projectRepository.findOne({
-      where: { id: project.id },
-    });
-
-    if (!foundProject) {
-      throw new Error(`Project with id ${project.id} not found`);
-    }
-
-    const tasks = await this.taskRepository.find({
-      where: { project: { id: foundProject.id } },
-    });
-
-    const totalTasks = tasks.length;
-    const completedTasks = tasks.filter((task) => task.status === 'Done').length;
+  async getProjectReport(projectId: number) {
+    const project = await this.projectRepository.findOne({where: { id: projectId }, relations: ['executors', 'tasks']});
+    const projectTitle = project.title;
+    const totalTasks = project.tasks.length;
+    const completedTasks = project.tasks.filter((task) => task.status === 'Done').length;
+    const backlog = project.tasks.filter((task) => task.status === 'Backlog').length;
+    const todo = project.tasks.filter((task) => task.status === 'To Do').length;
+    const inProgress = project.tasks.filter((task) => task.status === 'In Progress').length;
+    const done = project.tasks.filter((task) => task.status === 'Done').length;
     const progress = totalTasks > 0 ? `${(completedTasks / totalTasks) * 100}%` : '0%';
 
     return {
-      projectTitle: foundProject.title,
+      projectTitle,
       totalTasks,
-      completedTasks,
-      progress,
-    };
-  }
-
-  async getUserReport(userEmail: string) {
-    return {data: 'TODO'}
-    // const tasks = await this.taskRepository.find({
-    //   where: { executors: userEmail },
-    // });
-
-    // const totalTasks = tasks.length;
-    // const completedTasks = tasks.filter((task) => task.status === 'Done').length;
-    // const progress = totalTasks > 0 ? `${(completedTasks / totalTasks) * 100}%` : '0%';
-
-    // return {
-    //   userEmail,
-    //   totalTasks,
-    //   completedTasks,
-    //   progress,
-    // };
-  }
-
-  async getTaskProgress(filterDto: ReportFilterDto) {
-    const { project } = filterDto;
-
-    const foundProject = await this.projectRepository.findOne({
-      where: { id: project.id },
-    });
-
-    if (!foundProject) {
-      throw new Error(`Project with id ${project.id} not found`);
-    }
-
-    const tasks = await this.taskRepository.find({
-      where: { project: { id: foundProject.id } },
-    });
-
-    const backlog = tasks.filter((task) => task.status === 'Backlog').length;
-    const todo = tasks.filter((task) => task.status === 'To Do').length;
-    const inProgress = tasks.filter((task) => task.status === 'In Progress').length;
-    const done = tasks.filter((task) => task.status === 'Done').length;
-
-    return {
-      projectTitle: foundProject.title,
       backlog,
       todo,
       inProgress,
       done,
+      progress
+    };
+  }
+
+  async getUserReport(userId: number) {
+    const user = await this.userRepository.findOne({where: { id: userId }, relations: ['projects', 'tasks']});
+    const userEmale = user.email;
+    const totalTasks = user.tasks.length;
+    const totalProjects = user.projects.length;
+    const completedTasks = user.tasks.filter((task) => task.status === 'Done').length;
+    const progressTasks = totalTasks > 0 ? `${(completedTasks / totalTasks) * 100}%` : '0%';
+
+    return {
+      userEmale,
+      totalProjects,
+      totalTasks,
+      completedTasks,
+      progressTasks
     };
   }
 }
