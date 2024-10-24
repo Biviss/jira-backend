@@ -1,4 +1,4 @@
-import { Controller, Post, Body,Get, Query, Res, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param,Res,HttpStatus,Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { RegisterUserDto } from './dto/register-user.dto';
@@ -34,5 +34,19 @@ export class AuthController {
   @Get('verify_user')
   async verifyUser(@Query('token') token: string){
     return this.authService.verify_user(token);
+  }
+
+  @ApiOperation({summary: 'Get all users'})
+  @ApiResponse({type: User})
+  @Get()
+  async findAll(): Promise<User[]> {
+    return this.authService.findAll();
+  }
+
+  @ApiOperation({summary: 'Get the user by id'})
+  @ApiResponse({type: User})
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<User> {
+    return this.authService.findOne(+id);
   }
 }

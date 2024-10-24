@@ -14,17 +14,26 @@ export class ProjectService {
     private userRepository: Repository<User>
   ) {}
 
-  async create(dto: CreateProjectDto): Promise<Project> {
-    const project = this.projectRepository.create(dto);
-    return this.projectRepository.save(project);
+  async create(createProjectDto: CreateProjectDto): Promise<Project> {
+    const creator = await this.userRepository.findOne({where: { id: createProjectDto.creator.id }, relations: ['projectsCreator']});
+    if (!creator) {
+      throw new Error(`User with ID ${createProjectDto.creator.id} not found`);
+    }
+    const project = this.projectRepository.create({
+      ...createProjectDto,
+      creator,
+    });
+    const savedProject = await this.projectRepository.save(project);
+    creator.projectsCreator.push(savedProject);
+    return savedProject;
   }
 
   async findAll(): Promise<Project[]> {
-    return this.projectRepository.find({ relations: ['tasks', 'executors'] });
+    return this.projectRepository.find({ relations: ['tasks', 'executors', 'creator'] });
   }
 
   async findOne(id: number): Promise<Project> {
-    const project = await this.projectRepository.findOne({where: { id }, relations: ['tasks', 'executors']});
+    const project = await this.projectRepository.findOne({where: { id }, relations: ['tasks', 'executors', 'creator']});
     return project;
   }
 
@@ -52,8 +61,8 @@ export class ProjectService {
       project.executors.push(user);
     }
   
-    if (!user.projects.find((proj) => proj.id === projectId)) {
-      user.projects.push(project);
+    if (!user.projectsExrcutor.find((proj) => proj.id === projectId)) {
+      user.projectsExrcutor.push(project);
     }
   
     await this.projectRepository.save(project);

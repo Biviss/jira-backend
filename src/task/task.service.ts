@@ -29,7 +29,6 @@ export class TaskService {
     });
     const savedTask = await this.taskRepository.save(task);
     project.tasks.push(savedTask);
-    await this.projectRepository.save(project);
     return savedTask;
   }
 

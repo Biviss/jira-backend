@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 'typeorm';
 import { Project } from '../../project/entities/project.entity'
 import { Task } from '../../task/entities/task.entity'
 
@@ -21,8 +21,12 @@ export class User {
   @Column()
   role: string;
 
+  @ApiProperty({ type: () => [Project]})
+  @OneToMany(() => Project, (project) => project.creator, { cascade: true })
+  projectsCreator: Project[];
+
   @ManyToMany(() => Project, (project) => project.executors)
-  projects: Project[];
+  projectsExrcutor: Project[];
 
   @ManyToMany(() => Task, (task) => task.executors)
   tasks: Task[];

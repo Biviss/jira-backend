@@ -22,5 +22,8 @@ export class RegisterUserDto {
   tasks: Task[] = [];
 
   @IsNotEmpty()
-  projects: Project[] = [];
+  projectsCreator: Project[] = [];
+
+  @IsNotEmpty()
+  projectsExecutor: Project[] = [];
 }
