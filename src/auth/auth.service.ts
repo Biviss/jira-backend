@@ -31,4 +31,13 @@ export class AuthService {
     }
     throw new Error('Invalid credentials');
   }
+
+  async findAll(): Promise<User[]> {
+    return this.userRepository.find({ relations: ['tasks', 'projectsCreator', 'projectsExrcutor'] });
+  }
+
+  async findOne(id: number): Promise<User> {
+    const user = await this.userRepository.findOne({where: { id }, relations: ['tasks', 'projectsCreator', 'projectsExrcutor']});
+    return user;
+  }
 }

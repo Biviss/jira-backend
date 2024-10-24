@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -26,5 +26,19 @@ export class AuthController {
   @Post('login')
   async login(@Body() dto: LoginUserDto) {
     return this.authService.login(dto);
+  }
+
+  @ApiOperation({summary: 'Get all users'})
+  @ApiResponse({type: User})
+  @Get()
+  async findAll(): Promise<User[]> {
+    return this.authService.findAll();
+  }
+
+  @ApiOperation({summary: 'Get the user by id'})
+  @ApiResponse({type: User})
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<User> {
+    return this.authService.findOne(+id);
   }
 }

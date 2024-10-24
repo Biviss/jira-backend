@@ -14,6 +14,10 @@ export class CreateProjectDto {
   @IsNotEmpty()
   description: string;
 
+  @ApiProperty({example: {"id": 1}})
+  @IsNotEmpty()
+  creator: User;
+
   @IsNotEmpty()
   executors: User[] = [];
 
