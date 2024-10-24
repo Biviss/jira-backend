@@ -1,5 +1,6 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param,Res,HttpStatus,Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { Response } from 'express';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { ApiOperation, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -26,6 +27,13 @@ export class AuthController {
   @Post('login')
   async login(@Body() dto: LoginUserDto) {
     return this.authService.login(dto);
+  }
+
+  @ApiOperation({ summary: 'Get verify-user' })
+  @ApiResponse({ type: User })
+  @Get('verify_user')
+  async verifyUser(@Query('token') token: string){
+    return this.authService.verify_user(token);
   }
 
   @ApiOperation({summary: 'Get all users'})

@@ -6,7 +6,6 @@ async function start() {
   const PORT = process.env.SERVER_PORT || 2000
   const app = await NestFactory.create(AppModule);
   app.enableCors();
-
   const config = new DocumentBuilder()
     .setTitle('Jira')
     .setDescription('API Documentation')
