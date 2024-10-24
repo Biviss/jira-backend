@@ -3,6 +3,7 @@ import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { Project } from './entities/project.entity';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Task } from 'src/task/entities/task.entity';
 
 @ApiTags('projects')
 @Controller('projects')
@@ -28,6 +29,13 @@ export class ProjectController {
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<Project> {
     return this.projectService.findOne(+id);
+  }
+
+  @ApiOperation({summary: 'Get tasks in project by id'})
+  @ApiResponse({type: Project})
+  @Get('/tasks/:id')
+  async findTasks(@Param('id') id: string): Promise<Task[]> {
+    return this.projectService.getAlltasksInProjectById(+id);
   }
 
   @ApiOperation({summary: 'Update the project by id'})

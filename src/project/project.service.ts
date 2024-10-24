@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { Project } from './entities/project.entity';
 import { User } from '../auth/entities/user.entity';
+import { Task } from '../task/entities/task.entity'
 
 @Injectable()
 export class ProjectService {
@@ -67,6 +68,11 @@ export class ProjectService {
   
     await this.projectRepository.save(project);
     await this.userRepository.save(user);
+  }
+
+  async getAlltasksInProjectById(id: number): Promise<Task[]> {
+    const project = await this.projectRepository.findOne({where: { id }, relations: ['tasks', 'executors', 'creator']});
+    return project.tasks;
   }
 }
 

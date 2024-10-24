@@ -14,7 +14,7 @@ export class RegisterUserDto {
   password: string;
 
   @ApiProperty({example: 'admin'})
-  @IsEnum(['admin', 'user'])
+  @IsEnum(['admin', 'manager', 'developer'])
   @IsNotEmpty()
   role: string;
 
