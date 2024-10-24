@@ -19,7 +19,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
     const user = this.userRepository.create({ ...dto, password: hashedPassword });
     return this.userRepository.save(user);
-  }
+  } 
 
   async login(dto: LoginUserDto): Promise<{ accessToken: string }> {
     const user = await this.userRepository.findOne({ where: { email: dto.email } });
@@ -30,5 +30,17 @@ export class AuthService {
       };
     }
     throw new Error('Invalid credentials');
+  }
+  async verify_user(token: string): Promise<User> {
+    try {
+      const decoded = this.jwtService.verify(token);
+      const user = await this.userRepository.findOne({ where: { id: decoded.sub } });
+      if (!user) {
+        throw new Error('User not found');
+      }
+      return user;
+    } catch (error) {
+      throw new Error('Invalid token');
+    }
   }
 }
