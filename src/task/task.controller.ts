@@ -2,8 +2,9 @@ import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common'
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { Task } from './entities/task.entity';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('tasks')
 @Controller('tasks')
 export class TaskController {
   constructor(private taskService: TaskService) {}
@@ -40,5 +41,14 @@ export class TaskController {
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     return this.taskService.remove(+id);
+  }
+
+  @ApiOperation({summary: 'Add the executor to the task and vice versa'})
+  @Post(':taskId/executors/:userId')
+  async addExecutorToTask(
+    @Param('taskId') taskId: number,
+    @Param('userId') userId: number,
+  ): Promise<void> {
+    await this.taskService.addExecutorToTask(taskId, userId);
   }
 }

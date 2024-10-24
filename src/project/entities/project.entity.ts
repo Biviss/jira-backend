@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Task } from '../../task/entities/task.entity'
+import { User } from '../../auth/entities/user.entity'
 
 @Entity()
 export class Project {
@@ -15,11 +17,12 @@ export class Project {
   @Column()
   description: string;
 
-  @ApiProperty({example: ['user1@mail.com','user2@mail.com']})
-  @Column("text", { array: true })
-  participants: string[];
+  @ApiProperty({example: []})
+  @ManyToMany(() => User, (user) => user.projects)
+  @JoinTable()
+  executors: User[];
 
-  @ApiProperty({example: ['Task1','Task2']})
-  @Column("text", { array: true })
-  tasksTitles: string[];
+  @ApiProperty({ type: () => [Task]})
+  @OneToMany(() => Task, (task) => task.project, { cascade: true })
+  tasks: Task[];
 }

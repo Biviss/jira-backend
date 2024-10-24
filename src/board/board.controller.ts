@@ -2,8 +2,9 @@ import { Controller, Get, Patch, Body, Param } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 import { Task } from '../task/entities/task.entity';
-import { ApiOperation, ApiProperty, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('board')
 @Controller('board')
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}

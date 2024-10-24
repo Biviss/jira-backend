@@ -2,8 +2,9 @@ import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common'
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { Project } from './entities/project.entity';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('projects')
 @Controller('projects')
 export class ProjectController {
   constructor(private projectService: ProjectService) {}
@@ -40,5 +41,14 @@ export class ProjectController {
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     return this.projectService.remove(+id);
+  }
+
+  @ApiOperation({summary: 'Add the executor to the project and vice versa'})
+  @Post(':projectId/executors/:userId')
+  async addExecutorToProject(
+    @Param('projectId') projectId: number,
+    @Param('userId') userId: number,
+  ): Promise<void> {
+    await this.projectService.addExecutorToProject(projectId, userId);
   }
 }

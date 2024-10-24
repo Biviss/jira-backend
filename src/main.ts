@@ -5,7 +5,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function start() {
   const PORT = process.env.SERVER_PORT || 2000
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+<<<<<<< HEAD
+=======
+
+>>>>>>> 0aeb048d1ee85632c9f6ead821808bac327d4373
   const config = new DocumentBuilder()
     .setTitle('Jira')
     .setDescription('API Documentation')
