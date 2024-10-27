@@ -1,62 +1,78 @@
-import { Injectable, Logger } from '@nestjs/common';
-import * as sgMail from '@sendgrid/mail';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Notification } from './entities/notification.entity';
+import { CreateNotificationDto } from './dto/create-notification.dto';
+import { User } from '../auth/entities/user.entity';
+import { Project } from '../project/entities/project.entity';
+import { Task } from '../task/entities/task.entity';
+import { MailService } from '@sendgrid/mail';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class NotificationService {
-  private readonly logger = new Logger(NotificationService.name);
+  private mailService: MailService;
 
-  constructor() {
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  constructor(
+    @InjectRepository(Notification)
+    private notificationRepository: Repository<Notification>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    @InjectRepository(Project)
+    private projectRepository: Repository<Project>,
+    @InjectRepository(Task)
+    private taskRepository: Repository<Task>,
+    private configService: ConfigService,
+  ) {
+    this.mailService = new MailService();
+    this.mailService.setApiKey(this.configService.get<string>('SENDGRID_API_KEY'));
   }
 
-  async sendTaskUpdateNotification(recipientEmail: string, taskTitle: string, taskStatus: string): Promise<void> {
+  async createNotification(createNotificationDto: CreateNotificationDto): Promise<Notification> {
+    const userEntity = await this.userRepository.findOne({ where: { id: createNotificationDto.userId } });
+    const projectEntity = await this.projectRepository.findOne({ where: { id: createNotificationDto.projectId } });
+    const taskEntity = await this.taskRepository.findOne({ where: { id: createNotificationDto.taskId } });
+
+    if (!userEntity || !projectEntity || !taskEntity) {
+        throw new Error('User, Project, or Task not found');
+    }
+
+    const notification = this.notificationRepository.create({
+        ...createNotificationDto,
+        user: userEntity,
+        project: projectEntity,
+        task: taskEntity,
+    });
+
+    await this.notificationRepository.save(notification);
+    // TODO
+    // await this.sendEmail(userEntity.email, notification.subject, notification.text);
+    return notification;
+}
+
+
+  private async sendEmail(to: string, subject: string, text: string, html?: string) {
     const msg = {
-      to: recipientEmail,
-      from: process.env.SENDER,
-      subject: `Update on Task: ${taskTitle}`,
-      text: `The status of the task "${taskTitle}" has been updated to "${taskStatus}".`,
+      to,
+      from: this.configService.get<string>('SENDGRID_FROM_EMAIL'),
+      subject,
+      text,
+      html,
     };
 
     try {
-      await sgMail.send(msg);
-      this.logger.log(`Notification sent to ${recipientEmail}`);
+      await this.mailService.send(msg);
     } catch (error) {
-      this.logger.error(`Failed to send email to ${recipientEmail}`, error);
-      throw new Error('Email sending failed');
+      console.error('Error sending email:', error);
+      throw new Error('Failed to send email');
     }
   }
 
-  async sendNewCommentNotification(recipientEmail: string, taskTitle: string, comment: string): Promise<void> {
-    const msg = {
-      to: recipientEmail,
-      from: process.env.SENDER,
-      subject: `New Comment on Task: ${taskTitle}`,
-      text: `A new comment was added to the task "${taskTitle}":\n\n${comment}`,
-    };
+  async findOne(id: number): Promise<Notification> {
+    return this.notificationRepository.findOne({ where: { id } });
+}
 
-    try {
-      await sgMail.send(msg);
-      this.logger.log(`Notification sent to ${recipientEmail}`);
-    } catch (error) {
-      this.logger.error(`Failed to send email to ${recipientEmail}`, error);
-      throw new Error('Email sending failed');
-    }
-  }
-
-  async sendTaskAssignmentNotification(recipientEmail: string, taskTitle: string): Promise<void> {
-    const msg = {
-      to: recipientEmail,
-      from: process.env.SENDER,
-      subject: `You have been assigned to Task: ${taskTitle}`,
-      text: `You have been assigned to the task "${taskTitle}".`,
-    };
-
-    try {
-      await sgMail.send(msg);
-      this.logger.log(`Notification sent to ${recipientEmail}`);
-    } catch (error) {
-      this.logger.error(`Failed to send email to ${recipientEmail}`, error);
-      throw new Error('Email sending failed');
-    }
+  async findAll(): Promise<Notification[]> {
+    return this.notificationRepository.find();
   }
 }

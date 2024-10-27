@@ -53,7 +53,7 @@ export class ProjectService {
       throw new NotFoundException(`Project with ID ${projectId} not found`);
     }
   
-    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['projects'] });
+    const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['projectsExecutor'] });
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
     }
@@ -69,6 +69,32 @@ export class ProjectService {
     await this.projectRepository.save(project);
     await this.userRepository.save(user);
   }
+
+  async removeExecutor(projectId: number, executorId: number): Promise<Project> {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId },
+      relations: ['executors'],
+    });
+
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+
+    const executorIndex = project.executors.findIndex((executor) => executor.id === executorId);
+    if (executorIndex === -1) {
+      throw new NotFoundException('Executor not found in this project');
+    }
+
+    const executor = project.executors[executorIndex];
+    project.executors.splice(executorIndex, 1);
+
+    executor.projectsExecutor = executor.projectsExecutor.filter(proj => proj.id !== projectId);
+
+    await this.projectRepository.save(project);
+    await this.userRepository.save(executor);
+
+    return project;
+}
 
   async getAlltasksInProjectById(id: number): Promise<Task[]> {
     const project = await this.projectRepository.findOne({where: { id }, relations: ['tasks', 'executors', 'creator']});

@@ -13,7 +13,7 @@ import { User } from './entities/user.entity';
       signOptions: { expiresIn: '24h' },
     }),
   ],
-  exports: [TypeOrmModule],
+  exports: [TypeOrmModule, AuthService],
   controllers: [AuthController],
   providers: [AuthService],
 })

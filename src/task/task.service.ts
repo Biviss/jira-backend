@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './entities/task.entity';
 import { Project } from '../project/entities/project.entity'
 import { User } from '../auth/entities/user.entity';
@@ -53,14 +54,18 @@ export class TaskService {
     return this.taskRepository.findOne({where: { id }, relations: ['project', 'executors', 'comments']});
   }
 
-  async update(id: number, dto: CreateTaskDto): Promise<Task> {
-    const updateData = {
+  async update(id: number, dto: UpdateTaskDto): Promise<Task> {
+    const existingTask = await this.taskRepository.findOne({ where: { id } });
+    if (!existingTask) {
+      throw new Error('Task not found');
+    }
+
+    const updatedTask = {
+      ...existingTask,
       ...dto,
-      executors: dto.executors.map(executor => ({ id: executor.id })),
-      comments: dto.comments.map(comment => ({ id: comment.id })),
     };
-  
-    await this.taskRepository.update(id, updateData);
+
+    await this.taskRepository.save(updatedTask);
     return this.findOne(id);
   }
 

@@ -1,41 +1,32 @@
-import { Controller, Post, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { NotificationService } from './notification.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { CreateNotificationDto } from './dto/create-notification.dto';
+import { Notification } from './entities/notification.entity';
 
 @ApiTags('notifications')
 @Controller('notifications')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}
 
-  @ApiOperation({summary: 'Send a message for task status be updated'})
-  @ApiResponse({example: { message: 'Task update notification sent' }})
-  @Post('task-update')
-  async notifyTaskUpdate(@Query('email') email: string, @Query('taskTitle') taskTitle: string, @Query('taskStatus') taskStatus: string) {
-    await this.notificationService.sendTaskUpdateNotification(
-      email,
-      taskTitle,
-      taskStatus,
-    );
-    return { message: 'Task update notification sent' };
+  @Post()
+  @ApiOperation({ summary: 'Create a notification' })
+  @ApiResponse({ type: Notification })
+  async createNotification(@Body() createNotificationDto: CreateNotificationDto) {
+    return this.notificationService.createNotification(createNotificationDto);
   }
 
-  @ApiOperation({summary: 'A message for new task commit be added'})
-  @ApiResponse({example: { message: 'New comment notification sent' }})
-  @Post('new-comment')
-  async notifyNewComment(@Query('email') email: string, @Query('taskTitle') taskTitle: string, @Query('comment') comment: string) {
-    await this.notificationService.sendNewCommentNotification(
-      email,
-      taskTitle,
-      comment,
-    );
-    return { message: 'New comment notification sent' };
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a notification by ID' })
+  @ApiResponse({ type: Notification })
+  async getNotification(@Param('id') id: number) {
+    return this.notificationService.findOne(id);
   }
 
-  @ApiOperation({summary: 'A message for Task assignment'})
-  @ApiResponse({example: { message: 'Task assignment notification sent' }})
-  @Post('task-assignment')
-  async notifyTaskAssignment(@Query('email') email: string, @Query('taskTitle') taskTitle: string) {
-    await this.notificationService.sendTaskAssignmentNotification(email, taskTitle);
-    return { message: 'Task assignment notification sent' };
+  @Get()
+  @ApiOperation({ summary: 'Get all notifications' })
+  @ApiResponse({ type: Notification })
+  async getAllNotifications() {
+    return this.notificationService.findAll();
   }
 }

@@ -1,11 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsDate, IsEnum } from 'class-validator';
-import { Project } from '../../project/entities/project.entity'
-import { User } from '../../auth/entities/user.entity'
-import { Comment } from '../../comment/entities/comment.entity';
-import { Notification } from '../../notification/entities/notification.entity';
 
-export class CreateTaskDto {
+export class UpdateTaskDto {
   @ApiProperty({example: 'Task1'})
   @IsString()
   @IsNotEmpty()
@@ -27,18 +23,6 @@ export class CreateTaskDto {
   @IsNotEmpty()
   type: string;
 
-  @ApiProperty({example: {
-    "id": 1
-  }})
-  @IsNotEmpty()
-  project: Project;
-
-  @IsNotEmpty()
-  comments: Comment[] = [];
-
-  @IsNotEmpty()
-  notifications: Notification[] = [];
-
   @ApiProperty({example: '2024-10-15'})
   @IsDate()
   @IsNotEmpty()
@@ -48,7 +32,4 @@ export class CreateTaskDto {
   @IsEnum(['Low', 'Medium', 'High'])
   @IsNotEmpty()
   priority: string;
-
-  @IsNotEmpty()
-  executors: User[] = [];
 }

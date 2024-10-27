@@ -59,4 +59,13 @@ export class ProjectController {
   ): Promise<void> {
     await this.projectService.addExecutorToProject(projectId, userId);
   }
+  //TODo
+  // @Delete(':projectId/executors/:executorId')
+  // @ApiOperation({ summary: 'Remove executor from project' })
+  // async removeExecutorFromProject(
+  //   @Param('projectId') projectId: number,
+  //   @Param('executorId') executorId: number,
+  // ): Promise<Project> {
+  //   return this.projectService.removeExecutor(projectId, executorId);
+  // }
 }

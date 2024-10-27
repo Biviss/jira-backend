@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty } from 'class-validator';
 import { User } from '../../auth/entities/user.entity'
 import { Task } from '../../task/entities/task.entity'
+import { Notification } from '../../notification/entities/notification.entity';
 
 export class CreateProjectDto {
   @ApiProperty({example: 'Project1'})
@@ -23,4 +24,7 @@ export class CreateProjectDto {
 
   @IsNotEmpty()
   tasks: Task[] = [];
+
+  @IsNotEmpty()
+  notifications: Notification[] = [];
 }

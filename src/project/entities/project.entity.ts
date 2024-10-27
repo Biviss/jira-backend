@@ -2,6 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToMany, JoinTable, ManyToOne } from 'typeorm';
 import { Task } from '../../task/entities/task.entity'
 import { User } from '../../auth/entities/user.entity'
+import { Notification } from '../../notification/entities/notification.entity';
+
 
 @Entity()
 export class Project {
@@ -29,4 +31,7 @@ export class Project {
   @ApiProperty({ type: () => [Task]})
   @OneToMany(() => Task, (task) => task.project, { cascade: true })
   tasks: Task[];
+
+  @OneToMany(() => Notification, notification => notification.project)
+  notifications: Notification[];
 }

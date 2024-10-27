@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
+import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './entities/task.entity';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -33,7 +34,7 @@ export class TaskController {
   @ApiOperation({summary: 'Update the task by id'})
   @ApiResponse({type: Task})
   @Put(':id')
-  async update(@Param('id') id: string, @Body() dto: CreateTaskDto): Promise<Task> {
+  async update(@Param('id') id: string, @Body() dto: UpdateTaskDto): Promise<Task> {
     return this.taskService.update(+id, dto);
   }
 
