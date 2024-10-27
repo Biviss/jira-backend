@@ -40,6 +40,9 @@ export class AuthService {
       }
       return user;
     } catch (error) {
+      if (error.message === 'User not found') {
+        throw error;
+      }
       throw new Error('Invalid token');
     }
   }

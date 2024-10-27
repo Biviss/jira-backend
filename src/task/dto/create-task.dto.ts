@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsEmail, IsDate, IsEnum } from 'class-validator';
+import { IsString, IsNotEmpty, IsDate, IsEnum } from 'class-validator';
 import { Project } from '../../project/entities/project.entity'
 import { User } from '../../auth/entities/user.entity'
 
@@ -36,7 +36,7 @@ export class CreateTaskDto {
   deadline: Date;
 
   @ApiProperty({example: 'Medium'})
-  @IsEnum(['Low', 'Medium', 'Hihg'])
+  @IsEnum(['Low', 'Medium', 'High'])
   @IsNotEmpty()
   priority: string;
 

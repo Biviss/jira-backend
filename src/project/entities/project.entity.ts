@@ -22,7 +22,7 @@ export class Project {
   creator: User;
 
   @ApiProperty({example: []})
-  @ManyToMany(() => User, (user) => user.projectsExrcutor)
+  @ManyToMany(() => User, (user) => user.projectsExecutor)
   @JoinTable()
   executors: User[];
 

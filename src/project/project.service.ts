@@ -34,7 +34,7 @@ export class ProjectService {
   }
 
   async findOne(id: number): Promise<Project> {
-    const project = await this.projectRepository.findOne({where: { id }, relations: ['tasks', 'executors', 'creator']});
+    const project = await this.projectRepository.findOne({where: { id }, relations: ['tasks', 'executors', 'creator', 'tasks.executors']});
     return project;
   }
 
@@ -62,8 +62,8 @@ export class ProjectService {
       project.executors.push(user);
     }
   
-    if (!user.projectsExrcutor.find((proj) => proj.id === projectId)) {
-      user.projectsExrcutor.push(project);
+    if (!user.projectsExecutor.find((proj) => proj.id === projectId)) {
+      user.projectsExecutor.push(project);
     }
   
     await this.projectRepository.save(project);

@@ -26,7 +26,7 @@ export class User {
   projectsCreator: Project[];
 
   @ManyToMany(() => Project, (project) => project.executors)
-  projectsExrcutor: Project[];
+  projectsExecutor: Project[];
 
   @ManyToMany(() => Task, (task) => task.executors)
   tasks: Task[];

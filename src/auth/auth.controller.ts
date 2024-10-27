@@ -1,9 +1,8 @@
-import { Controller, Post, Body, Get, Param,Res,HttpStatus,Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param,Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { Response } from 'express';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
-import { ApiOperation, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
 
 @ApiTags('auth')
