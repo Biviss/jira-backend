@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString, IsNotEmpty, IsEnum } from 'class-validator';
 import { Project } from '../../project/entities/project.entity'
 import { Task } from '../../task/entities/task.entity'
+import { Comment } from '../../comment/entities/comment.entity';
 
 export class RegisterUserDto {
   @ApiProperty({example: 'emale@mail.com'})
@@ -20,6 +21,9 @@ export class RegisterUserDto {
 
   @IsNotEmpty()
   tasks: Task[] = [];
+
+  @IsNotEmpty()
+  comments: Comment[] = [];
 
   @IsNotEmpty()
   projectsCreator: Project[] = [];

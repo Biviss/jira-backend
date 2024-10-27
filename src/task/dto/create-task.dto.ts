@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsDate, IsEnum } from 'class-validator';
 import { Project } from '../../project/entities/project.entity'
 import { User } from '../../auth/entities/user.entity'
+import { Comment } from '../../comment/entities/comment.entity';
 
 export class CreateTaskDto {
   @ApiProperty({example: 'Task1'})
@@ -29,6 +30,9 @@ export class CreateTaskDto {
   }})
   @IsNotEmpty()
   project: Project;
+
+  @IsNotEmpty()
+  comments: Comment[] = [];
 
   @ApiProperty({example: '2024-10-15'})
   @IsDate()

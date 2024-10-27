@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 'typeorm';
 import { Project } from '../../project/entities/project.entity'
 import { Task } from '../../task/entities/task.entity'
+import { Comment } from '../../comment/entities/comment.entity';
 
 @Entity()
 export class User {
@@ -30,4 +31,7 @@ export class User {
 
   @ManyToMany(() => Task, (task) => task.executors)
   tasks: Task[];
+
+  @OneToMany(() => Comment, (comment) => comment.author)
+  comments: Comment[];
 }

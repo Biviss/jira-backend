@@ -48,11 +48,11 @@ export class AuthService {
   }
 
   async findAll(): Promise<User[]> {
-    return this.userRepository.find({ relations: ['tasks', 'projectsCreator', 'projectsExrcutor'] });
+    return this.userRepository.find({ relations: ['tasks', 'projectsCreator', 'projectsExecutor', 'comments'] });
   }
 
   async findOne(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({where: { id }, relations: ['tasks', 'projectsCreator', 'projectsExrcutor']});
+    const user = await this.userRepository.findOne({where: { id }, relations: ['tasks', 'projectsCreator', 'projectsExecutor', 'comments']});
     return user;
   }
 }
