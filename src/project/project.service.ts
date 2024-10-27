@@ -70,30 +70,35 @@ export class ProjectService {
     await this.userRepository.save(user);
   }
 
-  async removeExecutor(projectId: number, executorId: number): Promise<Project> {
-    const project = await this.projectRepository.findOne({
-      where: { id: projectId },
-      relations: ['executors'],
-    });
+async removeExecutorFromProject(projectId: number, executorId: number): Promise<Project> {
+  const project = await this.projectRepository.findOne({
+    where: { id: projectId },
+    relations: ['executors'], 
+  });
 
-    if (!project) {
-      throw new NotFoundException('Project not found');
-    }
+  if (!project) {
+    throw new NotFoundException(`Project with ID ${projectId} not found`);
+  }
 
-    const executorIndex = project.executors.findIndex((executor) => executor.id === executorId);
-    if (executorIndex === -1) {
-      throw new NotFoundException('Executor not found in this project');
-    }
+  const executorToRemove = project.executors.find(executor => executor.id === executorId);
+  if (!executorToRemove) {
+    throw new NotFoundException(`Executor with ID ${executorId} not found in this project`);
+  }
 
-    const executor = project.executors[executorIndex];
-    project.executors.splice(executorIndex, 1);
+  project.executors = project.executors.filter(executor => executor.id !== executorId);
+  await this.projectRepository.save(project);
 
+  const executor = await this.userRepository.findOne({
+    where: { id: executorId },
+    relations: ['projectsExecutor'],
+  });
+
+  if (executor) {
     executor.projectsExecutor = executor.projectsExecutor.filter(proj => proj.id !== projectId);
-
-    await this.projectRepository.save(project);
     await this.userRepository.save(executor);
+  }
 
-    return project;
+  return await this.findOne(projectId);
 }
 
   async getAlltasksInProjectById(id: number): Promise<Task[]> {

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, ParseIntPipe  } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { Project } from './entities/project.entity';
@@ -59,13 +59,13 @@ export class ProjectController {
   ): Promise<void> {
     await this.projectService.addExecutorToProject(projectId, userId);
   }
-  //TODo
-  // @Delete(':projectId/executors/:executorId')
-  // @ApiOperation({ summary: 'Remove executor from project' })
-  // async removeExecutorFromProject(
-  //   @Param('projectId') projectId: number,
-  //   @Param('executorId') executorId: number,
-  // ): Promise<Project> {
-  //   return this.projectService.removeExecutor(projectId, executorId);
-  // }
+
+  @Delete(':projectId/executors/:executorId')
+  @ApiOperation({ summary: 'Remove executor from project' })
+  async removeExecutor(
+  @Param('projectId', ParseIntPipe) projectId: number,
+  @Param('executorId', ParseIntPipe) executorId: number,
+  ): Promise<Project> {
+  return this.projectService.removeExecutorFromProject(projectId, executorId);
+  }
 }

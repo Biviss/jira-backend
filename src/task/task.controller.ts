@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -51,5 +51,14 @@ export class TaskController {
     @Param('userId') userId: number,
   ): Promise<void> {
     await this.taskService.addExecutorToTask(taskId, userId);
+  }
+
+  @Delete(':taskId/executors/:executorId')
+  @ApiOperation({ summary: 'Remove executor from task' })
+  async removeExecutor(
+    @Param('taskId', ParseIntPipe) taskId: number,
+    @Param('executorId', ParseIntPipe) executorId: number,
+  ): Promise<Task> {
+    return this.taskService.removeExecutorFromTask(taskId, executorId);
   }
 }

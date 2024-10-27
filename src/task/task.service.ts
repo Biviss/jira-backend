@@ -95,4 +95,35 @@ export class TaskService {
     await this.taskRepository.save(task);
     await this.userRepository.save(user);
   }
+
+  async removeExecutorFromTask(taskId: number, executorId: number): Promise<Task> {
+    const task = await this.taskRepository.findOne({
+      where: { id: taskId },
+      relations: ['executors'],
+    });
+
+    if (!task) {
+      throw new NotFoundException(`Task with ID ${taskId} not found`);
+    }
+
+    const executorToRemove = task.executors.find(executor => executor.id === executorId);
+    if (!executorToRemove) {
+      throw new NotFoundException(`Executor with ID ${executorId} not found in this task`);
+    }
+
+    task.executors = task.executors.filter(executor => executor.id !== executorId);
+    await this.taskRepository.save(task);
+
+    const executor = await this.userRepository.findOne({
+      where: { id: executorId },
+      relations: ['projectsExecutor'],
+    });
+
+    if (executor) {
+      executor.projectsExecutor = executor.projectsExecutor.filter(proj => proj.id !== task.project.id);
+      await this.userRepository.save(executor);
+    }
+
+    return task;
+  }
 }
