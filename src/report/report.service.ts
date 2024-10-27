@@ -49,7 +49,7 @@ export class ReportService {
 
     const userEmale = user.email;
     const totalTasks = user.tasks.length;
-    const totalProjects = user.projectsExrcutor.length;
+    const totalProjects = user.projectsExecutor.length;
     const completedTasks = user.tasks.filter((task) => task.status === 'Done').length;
     const progressTasks = totalTasks > 0 ? `${(completedTasks / totalTasks) * 100}%` : '0%';
 
