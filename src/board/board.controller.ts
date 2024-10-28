@@ -2,7 +2,7 @@ import { Controller, Get, Patch, Body, Param } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { UpdateTaskStatusDto } from './dto/update-task-status.dto';
 import { Task } from '../task/entities/task.entity';
-import { ApiOperation, ApiProperty, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('board')
 @Controller('board')
@@ -42,9 +42,9 @@ export class BoardController {
       ]
     },
   }})
-  @Get()
-  getAllTasks(): Promise<Record<string, Task[]>> {
-    return this.boardService.getAllTasks();
+  @Get(':id')
+  getAllTasks(@Param('id') id: number): Promise<Record<string, Task[]>> {
+    return this.boardService.getAllTasks(id);
   }
 
   @ApiOperation({summary: 'Update the task status by id'})

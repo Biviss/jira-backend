@@ -4,6 +4,7 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.entity';
+import { Project } from 'src/project/entities/project.entity';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -47,5 +48,12 @@ export class AuthController {
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<User> {
     return this.authService.findOne(+id);
+  }
+
+  @ApiOperation({summary: 'Get all projects in user by id'})
+  @ApiResponse({type: Project})
+  @Get('projects/:id')
+  async getUserProjects(@Param('id') id: number): Promise<void> {
+    this.authService.findOne(id);
   }
 }

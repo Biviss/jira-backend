@@ -29,20 +29,11 @@ export class TaskService {
       throw new Error(`Project with ID ${createTaskDto.project.id} not found`);
     }
   
-    const task = this.taskRepository.create({
-      title: createTaskDto.title,
-      description: createTaskDto.description,
-      status: createTaskDto.status,
-      type: createTaskDto.type,
-      priority: createTaskDto.priority,
-      deadline: createTaskDto.deadline,
-      project: project,
-      executors: createTaskDto.executors.map(user => ({ id: user.id })),
-      comments: createTaskDto.comments.map(comment => ({ id: comment.id })),
-    });
+    const task = this.taskRepository.create({...createTaskDto, project});
   
     const savedTask = await this.taskRepository.save(task);
     project.tasks.push(savedTask);
+    await this.projectRepository.save(project);
     return savedTask;
   }  
 

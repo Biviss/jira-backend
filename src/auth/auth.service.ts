@@ -6,6 +6,7 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { Project } from 'src/project/entities/project.entity';
 
 @Injectable()
 export class AuthService {
@@ -54,5 +55,11 @@ export class AuthService {
   async findOne(id: number): Promise<User> {
     const user = await this.userRepository.findOne({where: { id }, relations: ['tasks', 'projectsCreator', 'projectsExecutor', 'comments']});
     return user;
+  }
+
+  async getUsersProject(id: number): Promise<Project[]> {
+    const user = this.findOne(id);
+    const projects = [...(await user).projectsCreator, ...(await user).projectsExecutor];
+    return projects;
   }
 }
