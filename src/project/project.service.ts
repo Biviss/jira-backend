@@ -101,9 +101,8 @@ async removeExecutorFromProject(projectId: number, executorId: number): Promise<
   return await this.findOne(projectId);
 }
 
-  async getAlltasksInProjectById(id: number): Promise<Task[]> {
-    const project = await this.projectRepository.findOne({where: { id }, relations: ['tasks', 'executors', 'creator']});
+  async getAlltasksInProject(id: number): Promise<Task[]> {
+    const project = await this.projectRepository.findOne({where: { id }, relations: ['tasks', 'executors', 'creator', 'tasks.comments.author']});
     return project.tasks;
   }
 }
-

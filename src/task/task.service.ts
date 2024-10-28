@@ -65,56 +65,81 @@ export class TaskService {
   }
 
   async addExecutorToTask(taskId: number, userId: number): Promise<void> {
-    const task = await this.taskRepository.findOne({ where: { id: taskId }, relations: ['executors'] });
+    const task = await this.taskRepository.findOne({ 
+        where: { id: taskId }, 
+        relations: ['executors', 'project', 'project.executors']
+    });
     if (!task) {
-      throw new NotFoundException(`Task with ID ${taskId} not found`);
+        throw new NotFoundException(`Task with ID ${taskId} not found`);
     }
 
     const user = await this.userRepository.findOne({ where: { id: userId }, relations: ['tasks'] });
     if (!user) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
+        throw new NotFoundException(`User with ID ${userId} not found`);
     }
 
     if (!task.executors.find(executor => executor.id === userId)) {
-      task.executors.push(user);
+        task.executors.push(user);
     }
 
     if (!user.tasks.find(task => task.id === taskId)) {
-      user.tasks.push(task);
+        user.tasks.push(task);
+    }
+
+    const project = task.project;
+    if (project && !project.executors.find(executor => executor.id === userId)) {
+        project.executors.push(user);
     }
 
     await this.taskRepository.save(task);
     await this.userRepository.save(user);
+    await this.projectRepository.save(project);
+}
+
+async removeExecutorFromTask(taskId: number, executorId: number): Promise<Task> {
+  const task = await this.taskRepository.findOne({
+      where: { id: taskId },
+      relations: ['executors', 'project', 'project.executors', 'project.tasks', 'project.tasks.executors'],
+  });
+
+  if (!task) {
+      throw new NotFoundException(`Task with ID ${taskId} not found`);
   }
 
-  async removeExecutorFromTask(taskId: number, executorId: number): Promise<Task> {
-    const task = await this.taskRepository.findOne({
-      where: { id: taskId },
-      relations: ['executors'],
-    });
+  if (!task.project) {
+      throw new NotFoundException(`Project associated with Task ID ${taskId} not found`);
+  }
 
-    if (!task) {
-      throw new NotFoundException(`Task with ID ${taskId} not found`);
-    }
-
-    const executorToRemove = task.executors.find(executor => executor.id === executorId);
-    if (!executorToRemove) {
+  const executorToRemove = task.executors.find(executor => executor.id === executorId);
+  if (!executorToRemove) {
       throw new NotFoundException(`Executor with ID ${executorId} not found in this task`);
-    }
+  }
 
-    task.executors = task.executors.filter(executor => executor.id !== executorId);
-    await this.taskRepository.save(task);
+  task.executors = task.executors.filter(executor => executor.id !== executorId);
+  await this.taskRepository.save(task);
 
-    const executor = await this.userRepository.findOne({
+  const isExecutorInOtherTasks = task.project.tasks
+      .filter(otherTask => otherTask.id !== task.id)
+      .some(otherTask => 
+          otherTask.executors && 
+          otherTask.executors.some(executor => executor.id === executorId)
+      );
+
+  if (!isExecutorInOtherTasks) {
+      task.project.executors = task.project.executors.filter(executor => executor.id !== executorId);
+      await this.projectRepository.save(task.project);
+  }
+
+  const executor = await this.userRepository.findOne({
       where: { id: executorId },
       relations: ['projectsExecutor'],
-    });
+  });
 
-    if (executor) {
+  if (executor && executor.projectsExecutor) {
       executor.projectsExecutor = executor.projectsExecutor.filter(proj => proj.id !== task.project.id);
       await this.userRepository.save(executor);
-    }
-
-    return task;
   }
+
+  return task;
+}
 }

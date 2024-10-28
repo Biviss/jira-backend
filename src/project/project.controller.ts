@@ -35,7 +35,7 @@ export class ProjectController {
   @ApiResponse({type: Task})
   @Get('/tasks/:projectId')
   async findTasks(@Param('projectId') projectId: string): Promise<Task[]> {
-    return this.projectService.getAlltasksInProjectById(+projectId);
+    return this.projectService.getAlltasksInProject(+projectId);
   }
 
   @ApiOperation({summary: 'Update the project by id'})
