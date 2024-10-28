@@ -125,19 +125,19 @@ async removeExecutorFromTask(taskId: number, executorId: number): Promise<Task> 
           otherTask.executors.some(executor => executor.id === executorId)
       );
 
+      const executor = await this.userRepository.findOne({
+        where: { id: executorId },
+        relations: ['projectsExecutor'],
+    });
+
   if (!isExecutorInOtherTasks) {
       task.project.executors = task.project.executors.filter(executor => executor.id !== executorId);
       await this.projectRepository.save(task.project);
-  }
 
-  const executor = await this.userRepository.findOne({
-      where: { id: executorId },
-      relations: ['projectsExecutor'],
-  });
-
-  if (executor && executor.projectsExecutor) {
-      executor.projectsExecutor = executor.projectsExecutor.filter(proj => proj.id !== task.project.id);
-      await this.userRepository.save(executor);
+      if (executor && executor.projectsExecutor) {
+        executor.projectsExecutor = executor.projectsExecutor.filter(proj => proj.id !== task.project.id);
+        await this.userRepository.save(executor);
+    }
   }
 
   return task;
