@@ -12,7 +12,7 @@ export class CreateNotificationDto {
 
   @ApiProperty({
     example: 'TASK_UPDATE',
-    enum: ['SYSTEM', 'TASK_UPDATE', 'PROJECT_UPDATE', 'COMMENT'],
+    enum: ['SYSTEM', 'TASK_UPDATE', 'PROJECT_UPDATE', 'COMMENT']
   })
   @IsEnum(['SYSTEM', 'TASK_UPDATE', 'PROJECT_UPDATE', 'COMMENT'])
   type: string;
