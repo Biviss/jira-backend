@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -30,21 +30,21 @@ export class AuthService {
         accessToken: this.jwtService.sign(payload),
       };
     }
-    throw new Error('Invalid credentials');
+    throw new NotFoundException('Invalid credentials');
   }
   async verify_user(token: string): Promise<User> {
     try {
       const decoded = this.jwtService.verify(token);
       const user = await this.userRepository.findOne({ where: { id: decoded.sub } });
       if (!user) {
-        throw new Error('User not found');
+        throw new NotFoundException('User not found');
       }
       return user;
     } catch (error) {
       if (error.message === 'User not found') {
         throw error;
       }
-      throw new Error('Invalid token');
+      throw new NotFoundException('Invalid token');
     }
   }
 

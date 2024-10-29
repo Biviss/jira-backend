@@ -27,21 +27,21 @@ export class TaskController {
   @ApiOperation({summary: 'Get the task by id'})
   @ApiResponse({type: Task})
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Task> {
-    return this.taskService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<Task> {
+    return this.taskService.findOne(id);
   }
 
   @ApiOperation({summary: 'Update the task by id'})
   @ApiResponse({type: Task})
   @Put(':id')
-  async update(@Param('id') id: string, @Body() dto: UpdateTaskDto): Promise<Task> {
-    return this.taskService.update(+id, dto);
+  async update(@Param('id') id: number, @Body() dto: UpdateTaskDto): Promise<Task> {
+    return this.taskService.update(id, dto);
   }
 
   @ApiOperation({summary: 'Delete the task by id'})
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<void> {
-    return this.taskService.remove(+id);
+  async remove(@Param('id') id: number): Promise<void> {
+    return this.taskService.remove(id);
   }
 
   @ApiOperation({summary: 'Add the executor to the task and vice versa'})

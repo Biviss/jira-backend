@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification } from './entities/notification.entity';
@@ -34,7 +34,7 @@ export class NotificationService {
     const taskEntity = await this.taskRepository.findOne({ where: { id: createNotificationDto.taskId } });
 
     if (!userEntity || !projectEntity || !taskEntity) {
-        throw new Error('User, Project, or Task not found');
+        throw new NotFoundException('User, Project, or Task not found');
     }
 
     const notification = this.notificationRepository.create({
@@ -64,7 +64,7 @@ export class NotificationService {
       await this.mailService.send(msg);
     } catch (error) {
       console.error('Error sending email:', error);
-      throw new Error('Failed to send email');
+      throw new NotFoundException('Failed to send email');
     }
   }
 

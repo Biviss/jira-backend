@@ -18,7 +18,7 @@ export class ProjectService {
   async create(createProjectDto: CreateProjectDto): Promise<Project> {
     const creator = await this.userRepository.findOne({where: { id: createProjectDto.creator.id }, relations: ['projectsCreator']});
     if (!creator) {
-      throw new Error(`User with ID ${createProjectDto.creator.id} not found`);
+      throw new NotFoundException(`User with ID ${createProjectDto.creator.id} not found`);
     }
     const project = this.projectRepository.create({
       ...createProjectDto,

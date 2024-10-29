@@ -51,9 +51,9 @@ export class BoardController {
   @ApiResponse({type: Task})
   @Patch(':id/status')
   updateTaskStatus(
-    @Param('id') id: string,
+    @Param('id') id: number,
     @Body() updateTaskStatusDto: UpdateTaskStatusDto,
   ): Promise<Task> {
-    return this.boardService.updateTaskStatus(+id, updateTaskStatusDto);
+    return this.boardService.updateTaskStatus(id, updateTaskStatusDto);
   }
 }

@@ -27,28 +27,28 @@ export class ProjectController {
   @ApiOperation({summary: 'Get the project by id'})
   @ApiResponse({type: Project})
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<Project> {
-    return this.projectService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<Project> {
+    return this.projectService.findOne(id);
   }
 
   @ApiOperation({summary: 'Get tasks in project by id'})
   @ApiResponse({type: Task})
   @Get('/tasks/:projectId')
-  async findTasks(@Param('projectId') projectId: string): Promise<Task[]> {
-    return this.projectService.getAlltasksInProject(+projectId);
+  async findTasks(@Param('projectId') projectId: number): Promise<Task[]> {
+    return this.projectService.getAlltasksInProject(projectId);
   }
 
   @ApiOperation({summary: 'Update the project by id'})
   @ApiResponse({type: Project})
   @Put(':id')
-  async update(@Param('id') id: string, @Body() dto: CreateProjectDto): Promise<Project> {
-    return this.projectService.update(+id, dto);
+  async update(@Param('id') id: number, @Body() dto: CreateProjectDto): Promise<Project> {
+    return this.projectService.update(id, dto);
   }
 
   @ApiOperation({summary: 'Delete the project by id'})
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<void> {
-    return this.projectService.remove(+id);
+  async remove(@Param('id') id: number): Promise<void> {
+    return this.projectService.remove(id);
   }
 
   @ApiOperation({summary: 'Add the executor to the project and vice versa'})

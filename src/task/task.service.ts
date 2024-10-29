@@ -26,7 +26,7 @@ export class TaskService {
     });
   
     if (!project) {
-      throw new Error(`Project with ID ${createTaskDto.project.id} not found`);
+      throw new NotFoundException(`Project with ID ${createTaskDto.project.id} not found`);
     }
   
     const task = this.taskRepository.create({...createTaskDto, project});
@@ -48,7 +48,7 @@ export class TaskService {
   async update(id: number, dto: UpdateTaskDto): Promise<Task> {
     const existingTask = await this.taskRepository.findOne({ where: { id } });
     if (!existingTask) {
-      throw new Error('Task not found');
+      throw new NotFoundException('Task not found');
     }
 
     const updatedTask = {

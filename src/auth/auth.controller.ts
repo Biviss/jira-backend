@@ -46,14 +46,14 @@ export class AuthController {
   @ApiOperation({summary: 'Get the user by id'})
   @ApiResponse({type: User})
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<User> {
-    return this.authService.findOne(+id);
+  async findOne(@Param('id') id: number): Promise<User> {
+    return this.authService.findOne(id);
   }
 
   @ApiOperation({summary: 'Get all projects in user by id'})
   @ApiResponse({type: Project})
   @Get('projects/:id')
-  async getUserProjects(@Param('id') id: number): Promise<void> {
-    this.authService.findOne(id);
+  async getUserProjects(@Param('id') id: number): Promise<Project[]> {
+    return this.authService.getUsersProject(id);
   }
 }
