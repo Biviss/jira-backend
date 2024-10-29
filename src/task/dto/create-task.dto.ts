@@ -4,6 +4,7 @@ import { Project } from '../../project/entities/project.entity'
 import { User } from '../../auth/entities/user.entity'
 import { Comment } from '../../comment/entities/comment.entity';
 import { Notification } from '../../notification/entities/notification.entity';
+import { Subtask } from 'src/subtask/entities/subtask.entity';
 
 export class CreateTaskDto {
   @ApiProperty({example: 'Task1'})
@@ -38,6 +39,9 @@ export class CreateTaskDto {
 
   @IsNotEmpty()
   notifications: Notification[] = [];
+
+  @IsNotEmpty()
+  subtasks: Notification[] = [];
 
   @ApiProperty({example: '2024-10-15'})
   @IsDate()

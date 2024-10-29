@@ -5,11 +5,13 @@ import { TaskService } from './task.service';
 import { Task } from './entities/task.entity';
 import { User } from '../auth/entities/user.entity';
 import { Project } from '../project/entities/project.entity';
+import { Subtask } from 'src/subtask/entities/subtask.entity';
 
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Task, User, Project])],
+  imports: [TypeOrmModule.forFeature([Task, User, Project, Subtask])],
   controllers: [TaskController],
   providers: [TaskService],
+  exports: [TypeOrmModule]
 })
 export class TaskModule {}

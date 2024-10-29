@@ -4,6 +4,7 @@ import { Project } from '../../project/entities/project.entity'
 import { User } from '../../auth/entities/user.entity';
 import { Comment } from '../../comment/entities/comment.entity';
 import { Notification } from '../../notification/entities/notification.entity';
+import { Subtask } from 'src/subtask/entities/subtask.entity';
 
 @Entity()
 export class Task {
@@ -41,6 +42,9 @@ export class Task {
 
   @OneToMany(() => Notification, notification => notification.task)
   notifications: Notification[];
+
+  @OneToMany(() => Subtask, (subtask) => subtask.task, { cascade: true })
+  subtasks: Subtask[];
 
   @ApiProperty({example: '2024-10-15'})
   @Column()

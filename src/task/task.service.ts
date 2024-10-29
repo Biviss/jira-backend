@@ -6,6 +6,7 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './entities/task.entity';
 import { Project } from '../project/entities/project.entity'
 import { User } from '../auth/entities/user.entity';
+import { Subtask } from '../subtask/entities/subtask.entity';
 
 
 @Injectable()
@@ -37,12 +38,22 @@ export class TaskService {
     return savedTask;
   }  
 
+  async getSubtasks(taskId: number): Promise<Subtask[]> {
+    const task = await this.taskRepository.findOne({ where: { id: taskId }, relations: ['subtasks'] });
+
+    if (!task) {
+      throw new NotFoundException('Task not found');
+    }
+
+    return task.subtasks;
+  }
+
   async findAll(): Promise<Task[]> {
-    return this.taskRepository.find({ relations: ['project', 'executors', 'comments'] });
+    return this.taskRepository.find({ relations: ['project', 'executors', 'comments', 'subtasks'] });
   }
 
   async findOne(id: number): Promise<Task> {
-    return this.taskRepository.findOne({where: { id }, relations: ['project', 'executors', 'comments']});
+    return this.taskRepository.findOne({where: { id }, relations: ['project', 'executors', 'comments', 'subtasks']});
   }
 
   async update(id: number, dto: UpdateTaskDto): Promise<Task> {
