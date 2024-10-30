@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Subtask } from './entities/subtask.entity';
 import { CreateSubtaskDto } from './dto/create-subtask.dto'
+import { UpdateSubtaskDto } from './dto/update-subtask.dto';
 import { Task } from 'src/task/entities/task.entity';
 import { User } from 'src/auth/entities/user.entity';
 
@@ -40,10 +41,13 @@ export class SubtaskService {
     return this.subtaskRepository.findOne({ where: { id }, relations: ['task']});
   }
 
-  async update(id: number, subtaskData: Partial<Subtask>): Promise<Subtask> {
-    const executor = await this.userRepository.findOne({where: { id: subtaskData.executorId }});
-    subtaskData.executorEmail = executor.email;
-    await this.subtaskRepository.update(id, subtaskData);
+  async update(id: number, dto: UpdateSubtaskDto): Promise<Subtask> {
+    const executor = await this.userRepository.findOne({ where: { id: dto.executorId } });
+    if (executor) {
+      dto.executorEmail = executor.email;
+    }
+  
+    await this.subtaskRepository.update(id, dto);
     return this.findOne(id);
   }
 

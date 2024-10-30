@@ -14,7 +14,7 @@ export class UpdateSubtaskDto {
   status?: string;
 
   @IsOptional()
-  executorEmale?: string;
+  executorEmail?: string;
 
   @ApiProperty({ example: 1 })
   @IsOptional()
