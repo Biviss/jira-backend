@@ -1,7 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { User } from '../../auth/entities/user.entity';
-import { Project } from '../../project/entities/project.entity';
-import { Task } from '../../task/entities/task.entity';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class Notification {
@@ -11,14 +8,14 @@ export class Notification {
   @Column()
   type: string;
 
-  @ManyToOne(() => User, (user) => user.notifications, { onDelete: 'CASCADE' })
-  user: User;
+  @Column('json')
+  usersId: number[];
 
-  @ManyToOne(() => Project, (project) => project.notifications, { onDelete: 'CASCADE' })
-  project: Project;
+  @Column()
+  projectId: number;
 
-  @ManyToOne(() => Task, (task) => task.notifications, { onDelete: 'CASCADE' })
-  task: Task;
+  @Column()
+  taskId: number;
 
   @Column()
   subject: string;

@@ -13,13 +13,12 @@ export class UpdateSubtaskDto {
   @IsOptional()
   status?: string;
 
-  @ApiProperty({ example: 'user1@mail.com' })
   @IsOptional()
-  executorEmale: string;
+  executorEmale?: string;
 
   @ApiProperty({ example: 1 })
   @IsOptional()
-  executorId: number;
+  executorId?: number;
 
   @ApiProperty({example: 1})
   @IsOptional()

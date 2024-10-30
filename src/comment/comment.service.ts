@@ -4,16 +4,32 @@ import { Repository } from 'typeorm';
 import { Comment } from './entities/comment.entity';
 import { User } from '../auth/entities/user.entity';
 import { Task } from '../task/entities/task.entity';
+import { Notification } from 'src/notification/entities/notification.entity';
 
 @Injectable()
 export class CommentService {
   constructor(
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
+    @InjectRepository(Notification)
+    private readonly notificationRepository: Repository<Notification>,
+    @InjectRepository(Task)
+    private readonly taskRepository: Repository<Task>
   ) {}
 
   async createComment(text: string, author: User, task: Task): Promise<Comment> {
     const comment = this.commentRepository.create({ text, author, task });
+
+    const taskWithProject = await this.taskRepository.findOne({where: { id: task.id }, relations: ['project']});
+    const notification = new Notification();
+    notification.type = 'COMMENT';
+    notification.usersId = [author.id]; 
+    notification.projectId = taskWithProject.id;
+    notification.taskId = task.id;
+    notification.subject = `New comment on task ${task.title}`;
+    notification.text = `${author.email} commented: "${text}"`;
+    await this.notificationRepository.save(notification);
+
     return this.commentRepository.save(comment);
   }
 

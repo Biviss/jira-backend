@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateSubtaskDto {
   @ApiProperty({example: 'Subtask1'})
@@ -13,9 +13,8 @@ export class CreateSubtaskDto {
   @IsNotEmpty()
   status: string;
 
-  @ApiProperty({ example: 'user1@mail.com' })
-  @IsNotEmpty()
-  executorEmale: string;
+  @IsOptional()
+  executorEmaile?: string;
 
   @ApiProperty({ example: 1 })
   @IsNotEmpty()

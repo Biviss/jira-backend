@@ -4,16 +4,14 @@ import { Notification } from './entities/notification.entity';
 import { NotificationService } from './notification.service';
 import { NotificationController } from './notification.controller';
 import { AuthModule } from '../auth/auth.module';
-import { User } from '../auth/entities/user.entity';
-import { Project } from '../project/entities/project.entity';
-import { Task } from '../task/entities/task.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Notification, User, Project, Task]),
+    TypeOrmModule.forFeature([Notification]),
     AuthModule,
   ],
   controllers: [NotificationController],
   providers: [NotificationService],
+  exports: [TypeOrmModule]
 })
 export class NotificationModule {}

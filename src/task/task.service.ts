@@ -7,6 +7,7 @@ import { Task } from './entities/task.entity';
 import { Project } from '../project/entities/project.entity'
 import { User } from '../auth/entities/user.entity';
 import { Subtask } from '../subtask/entities/subtask.entity';
+import { Notification } from 'src/notification/entities/notification.entity';
 
 
 @Injectable()
@@ -17,7 +18,9 @@ export class TaskService {
     @InjectRepository(Project)
     private readonly projectRepository: Repository<Project>,
     @InjectRepository(User)
-    private userRepository: Repository<User>
+    private userRepository: Repository<User>,
+    @InjectRepository(Notification)
+    private notificationRepository: Repository<Notification>
   ) {}
 
   async create(createTaskDto: CreateTaskDto): Promise<Task> {
@@ -57,17 +60,24 @@ export class TaskService {
   }
 
   async update(id: number, dto: UpdateTaskDto): Promise<Task> {
-    const existingTask = await this.taskRepository.findOne({ where: { id } });
+    const existingTask = await this.taskRepository.findOne({ where: { id }, relations: ['executors', 'project'] });
     if (!existingTask) {
       throw new NotFoundException('Task not found');
     }
 
-    const updatedTask = {
-      ...existingTask,
-      ...dto,
-    };
+    const notification = new Notification();
+    notification.type = 'TASK_UPDATE';
+    notification.usersId = []; 
+    existingTask.executors.forEach(executor => {
+      notification.usersId.push(executor.id)
+    });
+    notification.projectId = existingTask.project.id;
+    notification.taskId = id;
+    notification.subject = `New update on task ${existingTask.title}`;
+    notification.text = `Task ${existingTask.title} updated`;
+    await this.notificationRepository.save(notification);
 
-    await this.taskRepository.save(updatedTask);
+    await this.taskRepository.save({...existingTask, ...dto});
     return this.findOne(id);
   }
 

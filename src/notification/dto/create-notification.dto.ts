@@ -17,9 +17,9 @@ export class CreateNotificationDto {
   @IsEnum(['SYSTEM', 'TASK_UPDATE', 'PROJECT_UPDATE', 'COMMENT'])
   type: string;
 
-  @ApiProperty({ example: 1 })
+  @ApiProperty({ example: [1] })
   @IsNotEmpty()
-  userId: number;
+  usersId: number[];
 
   @ApiProperty({ example: 1 })
   @IsNotEmpty()

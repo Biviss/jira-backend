@@ -3,7 +3,6 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTabl
 import { Project } from '../../project/entities/project.entity'
 import { User } from '../../auth/entities/user.entity';
 import { Comment } from '../../comment/entities/comment.entity';
-import { Notification } from '../../notification/entities/notification.entity';
 import { Subtask } from 'src/subtask/entities/subtask.entity';
 
 @Entity()
@@ -39,9 +38,6 @@ export class Task {
 
   @OneToMany(() => Comment, (comment) => comment.task)
   comments: Comment[];
-
-  @OneToMany(() => Notification, notification => notification.task)
-  notifications: Notification[];
 
   @OneToMany(() => Subtask, (subtask) => subtask.task, { cascade: true })
   subtasks: Subtask[];

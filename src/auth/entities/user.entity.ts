@@ -3,7 +3,6 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, OneToMany } from 't
 import { Project } from '../../project/entities/project.entity'
 import { Task } from '../../task/entities/task.entity'
 import { Comment } from '../../comment/entities/comment.entity';
-import { Notification } from '../../notification/entities/notification.entity';
 
 @Entity()
 export class User {
@@ -35,7 +34,4 @@ export class User {
 
   @OneToMany(() => Comment, (comment) => comment.author)
   comments: Comment[];
-
-  @OneToMany(() => Notification, notification => notification.user)
-  notifications: Notification[];
 }

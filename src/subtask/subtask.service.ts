@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Subtask } from './entities/subtask.entity';
 import { CreateSubtaskDto } from './dto/create-subtask.dto'
 import { Task } from 'src/task/entities/task.entity';
+import { User } from 'src/auth/entities/user.entity';
 
 @Injectable()
 export class SubtaskService {
@@ -11,14 +12,22 @@ export class SubtaskService {
     @InjectRepository(Subtask)
     private readonly subtaskRepository: Repository<Subtask>,
     @InjectRepository(Task)
-    private readonly taskRepository: Repository<Task>
+    private readonly taskRepository: Repository<Task>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>
   ) {}
 
   async create(createSubtaskDto: CreateSubtaskDto): Promise<Subtask> {
     const task = await this.taskRepository.findOne({where: { id: createSubtaskDto.taskId }, relations: ['subtasks']});
-    const subtask = this.subtaskRepository.create(createSubtaskDto);
-    task.subtasks.push(subtask)
-    await this.taskRepository.save(task)
+    const executor = await this.userRepository.findOne({where: { id: createSubtaskDto.executorId }});
+
+    if (!executor) {
+      throw new NotFoundException(`Executor with id ${createSubtaskDto.executorId} not found`);
+    }
+
+    const subtask = this.subtaskRepository.create({...createSubtaskDto, executorEmail: executor.email});
+    task.subtasks.push(subtask);
+    await this.taskRepository.save(task);
     return this.subtaskRepository.save(subtask);
   }
   
@@ -32,6 +41,8 @@ export class SubtaskService {
   }
 
   async update(id: number, subtaskData: Partial<Subtask>): Promise<Subtask> {
+    const executor = await this.userRepository.findOne({where: { id: subtaskData.executorId }});
+    subtaskData.executorEmail = executor.email;
     await this.subtaskRepository.update(id, subtaskData);
     return this.findOne(id);
   }

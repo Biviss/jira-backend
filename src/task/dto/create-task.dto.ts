@@ -3,7 +3,6 @@ import { IsString, IsNotEmpty, IsDate, IsEnum } from 'class-validator';
 import { Project } from '../../project/entities/project.entity'
 import { User } from '../../auth/entities/user.entity'
 import { Comment } from '../../comment/entities/comment.entity';
-import { Notification } from '../../notification/entities/notification.entity';
 import { Subtask } from 'src/subtask/entities/subtask.entity';
 
 export class CreateTaskDto {
@@ -28,9 +27,7 @@ export class CreateTaskDto {
   @IsNotEmpty()
   type: string;
 
-  @ApiProperty({example: {
-    "id": 1
-  }})
+  @ApiProperty({example: 1})
   @IsNotEmpty()
   project: Project;
 
@@ -38,10 +35,7 @@ export class CreateTaskDto {
   comments: Comment[] = [];
 
   @IsNotEmpty()
-  notifications: Notification[] = [];
-
-  @IsNotEmpty()
-  subtasks: Notification[] = [];
+  subtasks: Subtask[] = [];
 
   @ApiProperty({example: '2024-10-15'})
   @IsDate()

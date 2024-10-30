@@ -14,7 +14,7 @@ export class Subtask {
 
   @ApiProperty({ example: 'user1@mail.com' })
   @Column()
-  executorEmale: string;
+  executorEmail: string;
 
   @ApiProperty({ example: 1 })
   @Column()
