@@ -4,6 +4,7 @@ import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { Task } from './entities/task.entity';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Subtask } from 'src/subtask/entities/subtask.entity';
 
 @ApiTags('tasks')
 @Controller('tasks')
@@ -18,10 +19,17 @@ export class TaskController {
   }
 
   @ApiOperation({summary: 'Get all tasks'})
-  @ApiResponse({type: Task})
+  @ApiResponse({type: [Task]})
   @Get()
   async findAll(): Promise<Task[]> {
     return this.taskService.findAll();
+  }
+
+  @ApiOperation({summary: 'Get all subtasks in a task by id'})
+  @ApiResponse({type: [Subtask]})
+  @Get('/subtasks/:id')
+  async getAllSubtasksInTask(@Param('id') id: number): Promise<Subtask[]> {
+    return this.taskService.getAllSubtasksInTask(id);
   }
 
   @ApiOperation({summary: 'Get the task by id'})

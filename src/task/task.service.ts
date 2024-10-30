@@ -59,6 +59,10 @@ export class TaskService {
     return this.taskRepository.findOne({where: { id }, relations: ['project', 'executors', 'comments', 'subtasks']});
   }
 
+  async getAllSubtasksInTask(id: number): Promise<Subtask[]> {
+    return (await this.findOne(id)).subtasks
+  }
+
   async update(id: number, dto: UpdateTaskDto): Promise<Task> {
     const existingTask = await this.taskRepository.findOne({ where: { id }, relations: ['executors', 'project'] });
     if (!existingTask) {
