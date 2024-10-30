@@ -5,6 +5,7 @@ import { Notification } from './entities/notification.entity';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { MailService } from '@sendgrid/mail';
 import { ConfigService } from '@nestjs/config';
+import { User } from 'src/auth/entities/user.entity';
 
 @Injectable()
 export class NotificationService {
@@ -14,21 +15,34 @@ export class NotificationService {
     @InjectRepository(Notification)
     private notificationRepository: Repository<Notification>,
     private configService: ConfigService,
+    @InjectRepository(User)
+    private userRepository: Repository<User>
   ) {
     this.mailService = new MailService();
     this.mailService.setApiKey(this.configService.get<string>('SENDGRID_API_KEY'));
   }
 
   async createNotification(createNotificationDto: CreateNotificationDto): Promise<Notification> {
-
-    const notification = this.notificationRepository.create({...createNotificationDto});
-
+    const notification = this.notificationRepository.create({ ...createNotificationDto });
     await this.notificationRepository.save(notification);
-    // TODO
-    // await this.sendEmail(userEntity.email, notification.subject, notification.text);
     return notification;
-}
+  }
 
+  async sendNotificationEmail(id: number): Promise<void> {
+    const notification = await this.findOne(id);
+    if (!notification) {
+      throw new NotFoundException(`Notification with ID ${id} not found`);
+    }
+
+    const sendEmailPromises = notification.usersId.map(async userId => {
+      const user = await this.userRepository.findOne({ where: { id: userId } });
+      if (user && user.email) {
+        return this.sendEmail(user.email, notification.subject, notification.text);
+      }
+    });
+
+    await Promise.all(sendEmailPromises);
+  }
 
   private async sendEmail(to: string, subject: string, text: string, html?: string) {
     const msg = {

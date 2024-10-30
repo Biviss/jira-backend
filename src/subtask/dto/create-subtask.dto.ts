@@ -16,9 +16,8 @@ export class CreateSubtaskDto {
   @IsOptional()
   executorEmaile?: string;
 
-  @ApiProperty({ example: 1 })
-  @IsNotEmpty()
-  executorId: number;
+  @IsOptional()
+  executorId?: number;
 
   @ApiProperty({example: 1})
   @IsNotEmpty()

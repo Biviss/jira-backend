@@ -29,4 +29,11 @@ export class NotificationController {
   async getAllNotifications() {
     return this.notificationService.findAll();
   }
+
+  @Post(':id/send')
+  @ApiOperation({ summary: 'Send notification email to users' })
+  async sendNotification(@Param('id') id: number) {
+    await this.notificationService.sendNotificationEmail(id);
+    return { message: 'Emails sent successfully' };
+  }
 }

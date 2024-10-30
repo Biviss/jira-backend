@@ -20,13 +20,8 @@ export class SubtaskService {
 
   async create(createSubtaskDto: CreateSubtaskDto): Promise<Subtask> {
     const task = await this.taskRepository.findOne({where: { id: createSubtaskDto.taskId }, relations: ['subtasks']});
-    const executor = await this.userRepository.findOne({where: { id: createSubtaskDto.executorId }});
 
-    if (!executor) {
-      throw new NotFoundException(`Executor with id ${createSubtaskDto.executorId} not found`);
-    }
-
-    const subtask = this.subtaskRepository.create({...createSubtaskDto, executorEmail: executor.email});
+    const subtask = this.subtaskRepository.create({...createSubtaskDto, executorEmail: '', executorId: 0});
     task.subtasks.push(subtask);
     await this.taskRepository.save(task);
     return this.subtaskRepository.save(subtask);
@@ -43,11 +38,8 @@ export class SubtaskService {
 
   async update(id: number, dto: UpdateSubtaskDto): Promise<Subtask> {
     const executor = await this.userRepository.findOne({ where: { id: dto.executorId } });
-    if (executor) {
-      dto.executorEmail = executor.email;
-    }
-  
-    await this.subtaskRepository.update(id, dto);
+    const task = await this.taskRepository.findOne({ where: { id: dto.taskId } });
+    await this.subtaskRepository.update(id, {title: dto.title, status: dto.status, executorEmail: executor.email, executorId: dto.executorId, task: task});
     return this.findOne(id);
   }
 
