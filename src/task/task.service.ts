@@ -123,48 +123,52 @@ export class TaskService {
 
 async removeExecutorFromTask(taskId: number, executorId: number): Promise<Task> {
   const task = await this.taskRepository.findOne({
-      where: { id: taskId },
-      relations: ['executors', 'project', 'project.executors', 'project.tasks', 'project.tasks.executors'],
+    where: { id: taskId },
+    relations: ['executors', 'project', 'project.executors', 'project.tasks', 'project.tasks.executors'],
   });
 
   if (!task) {
-      throw new NotFoundException(`Task with ID ${taskId} not found`);
-  }
-
-  if (!task.project) {
-      throw new NotFoundException(`Project associated with Task ID ${taskId} not found`);
+    throw new NotFoundException(`Task with ID ${taskId} not found`);
   }
 
   const executorToRemove = task.executors.find(executor => executor.id === executorId);
   if (!executorToRemove) {
-      throw new NotFoundException(`Executor with ID ${executorId} not found in this task`);
+    throw new NotFoundException(`Executor with ID ${executorId} not found in this task`);
   }
 
-  task.executors = task.executors.filter(executor => executor.id !== executorId);
-  await this.taskRepository.save(task);
+  await this.taskRepository
+    .createQueryBuilder()
+    .relation(Task, "executors")
+    .of(taskId)
+    .remove(executorId);
 
   const isExecutorInOtherTasks = task.project.tasks
-      .filter(otherTask => otherTask.id !== task.id)
-      .some(otherTask => 
-          otherTask.executors && 
-          otherTask.executors.some(executor => executor.id === executorId)
-      );
-
-      const executor = await this.userRepository.findOne({
-        where: { id: executorId },
-        relations: ['projectsExecutor'],
-    });
+    .filter(otherTask => otherTask.id !== task.id)
+    .some(otherTask =>
+      otherTask.executors.some(executor => executor.id === executorId)
+    );
 
   if (!isExecutorInOtherTasks) {
-      task.project.executors = task.project.executors.filter(executor => executor.id !== executorId);
-      await this.projectRepository.save(task.project);
+    await this.projectRepository
+      .createQueryBuilder()
+      .relation(Project, "executors")
+      .of(task.project.id)
+      .remove(executorId);
 
-      if (executor && executor.projectsExecutor) {
-        executor.projectsExecutor = executor.projectsExecutor.filter(proj => proj.id !== task.project.id);
-        await this.userRepository.save(executor);
+    const executor = await this.userRepository.findOne({
+      where: { id: executorId },
+      relations: ['projectsExecutor'],
+    });
+
+    if (executor && executor.projectsExecutor) {
+      executor.projectsExecutor = executor.projectsExecutor.filter(proj => proj.id !== task.project.id);
+      await this.userRepository.save(executor);
     }
   }
 
-  return task;
+  return this.taskRepository.findOne({
+    where: { id: taskId },
+    relations: ['executors', 'project', 'project.executors', 'project.tasks', 'project.tasks.executors'],
+  });
 }
 }
