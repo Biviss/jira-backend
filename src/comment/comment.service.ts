@@ -13,25 +13,39 @@ export class CommentService {
     private readonly commentRepository: Repository<Comment>,
     @InjectRepository(Notification)
     private readonly notificationRepository: Repository<Notification>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     @InjectRepository(Task)
     private readonly taskRepository: Repository<Task>
   ) {}
 
-  async createComment(text: string, author: User, task: Task): Promise<Comment> {
+  async createComment(text: string, authorId: number, taskId: number): Promise<Comment> {
+    const author = await this.userRepository.findOne({ where: { id: authorId } });
+    const task = await this.taskRepository.findOne({ where: { id: taskId } });
+
+    if (!author) {
+        throw new NotFoundException(`Author with ID ${authorId} not found`);
+    }
+
+    if (!task) {
+        throw new NotFoundException(`Task with ID ${taskId} not found`);
+    }
+
     const comment = this.commentRepository.create({ text, author, task });
 
-    const taskWithProject = await this.taskRepository.findOne({where: { id: task.id }, relations: ['project']});
+    const taskWithProject = await this.taskRepository.findOne({ where: { id: task.id }, relations: ['project'] });
+    
     const notification = new Notification();
     notification.type = 'COMMENT';
     notification.usersId = [author.id]; 
-    notification.projectId = taskWithProject.id;
+    notification.projectId = taskWithProject.project.id;
     notification.taskId = task.id;
     notification.subject = `New comment on task ${task.title}`;
     notification.text = `${author.email} commented: "${text}"`;
     await this.notificationRepository.save(notification);
 
     return this.commentRepository.save(comment);
-  }
+}
 
   async getCommentById(id: number): Promise<Comment> {
     const comment = await this.commentRepository.findOne({ where: { id }, relations: ['author', 'task'] });

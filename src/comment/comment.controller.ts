@@ -17,7 +17,7 @@ export class CommentController {
   @ApiResponse({type: Comment })
   async createComment(@Body() createCommentDto: CreateCommentDto) {
     const { text, authorId, taskId } = createCommentDto;
-    return this.commentService.createComment(text, { id: authorId } as User, { id: taskId } as Task);
+    return this.commentService.createComment(text, authorId, taskId);
   }
 
   @Get(':id')
