@@ -5,7 +5,7 @@ This project implements the server-side of a task management system (Task Manage
 
 ## Required Tools
 
-- [Node.js](https://nodejs.org/) (version 16.x or newer)
+- [Node.js](https://nodejs.org/) (version 20.x or newer)
 - [Docker](https://www.docker.com/) for containerizing the database
 - [PostgreSQL](https://www.postgresql.org/) (if running locally)
 
@@ -76,4 +76,3 @@ npm run test
 ## Additional Information
 
 - **Swagger documentation**: available at `/api`.
-- **Linting**: run `npm run lint` to check the code style.
